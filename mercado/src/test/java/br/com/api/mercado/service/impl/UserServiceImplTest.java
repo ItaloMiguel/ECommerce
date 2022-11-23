@@ -135,12 +135,10 @@ class UserServiceImplTest {
     *   |----> Just create new users for testing
     * */
     private User createUserAdmin() {
-        List<Role> ROLES = getRoleAdminList();
-        return new User(ADMIN_ID, ADMIN_USERNAME, ADMIN_EMAIL, ADMIN_PASSWORD, ROLES);
+        return new User(ADMIN_ID, ADMIN_USERNAME, ADMIN_EMAIL, ADMIN_PASSWORD, ROLES_ADMIN);
     }
     private User createUserNormal() {
-        List<Role> ROLES = getRoleUserList();
-        return new User(USER_ID, USER_USERNAME, USER_EMAIL, USER_PASSWORD, ROLES);
+        return new User(USER_ID, USER_USERNAME, USER_EMAIL, USER_PASSWORD, ROLES_USER);
     }
 
     private List<User> getUsersList() {
@@ -163,12 +161,10 @@ class UserServiceImplTest {
     *   |----> Example: listAll, findById, etc...
     * */
     private UserInfoResponse createUserInfoResponseUser() {
-        List<Role> ROLES = getRoleUserList();
-        return new UserInfoResponse(USER_ID, USER_USERNAME, USER_EMAIL, ROLES);
+        return new UserInfoResponse(USER_ID, USER_USERNAME, USER_EMAIL, ROLES_USER);
     }
     private UserInfoResponse createUserInfoResponseAdmin() {
-        List<Role> ROLES = getRoleAdminList();
-        return new UserInfoResponse(ADMIN_ID, ADMIN_USERNAME, ADMIN_EMAIL, ROLES);
+        return new UserInfoResponse(ADMIN_ID, ADMIN_USERNAME, ADMIN_EMAIL, ROLES_ADMIN);
     }
 
     /*  |--> CREATING ROLES

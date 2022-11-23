@@ -67,6 +67,8 @@ class UserServiceImplTest {
     private final User USER_NORMAL = createUserNormal();
     private final List<User> USER_LIST = getUsersList();
     private final UserRegisterRequest REQUEST = createUserRegisterRequest();
+    private final UserInfoResponse RESPONSE_USER = createUserInfoResponseUser();
+    private final UserInfoResponse RESPONSE_ADMIN = createUserInfoResponseAdmin();
 
     private final Role ROLE_USER = getRoleUser();
     private final Role ROLE_ADMIN = getRoleAdmin();
@@ -106,16 +108,16 @@ class UserServiceImplTest {
     @Test
     @SneakyThrows
     void saveUser_With_Successfully() {
-        when(userRepository.save(any())).thenReturn(USER_ADMIN);
-        when(roleRepository.findByName(any())).thenReturn(ROLES_OPTIONAL_ADMIN);
+        when(userRepository.save(any())).thenReturn(USER_NORMAL);
+        when(roleRepository.findByName(any())).thenReturn(ROLES_OPTIONAL_USER);
 
         UserInfoResponse response = service.saveUser(REQUEST);
 
         assertNotNull(response);
-        assertEquals(ADMIN_ID, response.getId());
-        assertEquals(ADMIN_USERNAME, response.getUsername());
-        assertEquals(ADMIN_EMAIL,response.getEmail());
-        assertEquals(ROLES_ADMIN, response.getRoles());
+        assertEquals(RESPONSE_USER.getId(), response.getId());
+        assertEquals(RESPONSE_USER.getUsername(), response.getUsername());
+        assertEquals(RESPONSE_USER.getEmail(),response.getEmail());
+        assertEquals(RESPONSE_USER.getRoles(), response.getRoles());
     }
 
     @Test
@@ -138,16 +140,16 @@ class UserServiceImplTest {
         List<UserInfoResponse> responses = service.findAll();
 
         assertNotNull(responses.get(0));
-        assertEquals(USER_ID, responses.get(0).getId());
-        assertEquals(USER_USERNAME, responses.get(0).getUsername());
-        assertEquals(USER_EMAIL, responses.get(0).getEmail());
-        assertEquals(ROLES_USER, responses.get(0).getRoles());
+        assertEquals(RESPONSE_USER.getId(), responses.get(0).getId());
+        assertEquals(RESPONSE_USER.getUsername(), responses.get(0).getUsername());
+        assertEquals(RESPONSE_USER.getEmail(), responses.get(0).getEmail());
+        assertEquals(RESPONSE_USER.getRoles(), responses.get(0).getRoles());
 
         assertNotNull(responses.get(1));
-        assertEquals(ADMIN_ID, responses.get(1).getId());
-        assertEquals(ADMIN_USERNAME, responses.get(1).getUsername());
-        assertEquals(ADMIN_EMAIL, responses.get(1).getEmail());
-        assertEquals(ROLES_ADMIN, responses.get(1).getRoles());
+        assertEquals(RESPONSE_ADMIN.getId(), responses.get(1).getId());
+        assertEquals(RESPONSE_ADMIN.getUsername(), responses.get(1).getUsername());
+        assertEquals(RESPONSE_ADMIN.getEmail(), responses.get(1).getEmail());
+        assertEquals(RESPONSE_ADMIN.getRoles(), responses.get(1).getRoles());
     }
 
     @Test
@@ -155,10 +157,10 @@ class UserServiceImplTest {
     void findTheRolesUserInTheDatabase_With_Successfully() {
         when(roleRepository.findByName(any())).thenReturn(ROLES_OPTIONAL_USER);
 
-        Role response = service.findTheRolesInTheDatabase(ROLE_USER_NAME);
+        Role response = service.findTheRolesInTheDatabase(ROLE_USER.getName());
 
         assertNotNull(response);
-        assertEquals(Role.class ,response.getClass());
+        assertEquals(ROLE_USER.getClass() ,response.getClass());
         assertEquals(ROLE_USER.getId(),response.getId());
         assertEquals(ROLE_USER.getName(), response.getName());
     }

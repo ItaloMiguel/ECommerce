@@ -1,5 +1,7 @@
 package br.com.api.mercado.service.impl;
 
+import br.com.api.mercado.exceptions.EmailAlreadyExistException;
+import br.com.api.mercado.exceptions.MyRoleNotFoundException;
 import br.com.api.mercado.model.Role;
 import br.com.api.mercado.model.User;
 import br.com.api.mercado.payload.request.UserRegisterRequest;
@@ -13,6 +15,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
+import javax.management.relation.RoleNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -31,7 +34,7 @@ class UserServiceImplTest {
     private static final String ADMIN_USERNAME = "admin";
     private static final String ADMIN_EMAIL = "admin@test.com";
     private static final String ADMIN_PASSWORD = "password";
-    private static final String ROLE_ADMIN = "ROLE_ADMIN";
+    private static final String ROLE_ADMIN_NAME = "ROLE_ADMIN";
 
      /*  |--> INFO OF USER NORMAL
      *   |----> it's was use for create user_normal
@@ -40,7 +43,7 @@ class UserServiceImplTest {
     private static final String USER_USERNAME = "user";
     private static final String USER_EMAIL = "user@test.com";
     private static final String USER_PASSWORD = "password";
-    private static final String ROLE_USER = "ROLE_USER";
+    private static final String ROLE_USER_NAME = "ROLE_USER";
 
 
      /*  |--> INFO OF USER REGISTER REQUEST
@@ -63,6 +66,10 @@ class UserServiceImplTest {
     private final User USER_ADMIN = createUserAdmin();
     private final User USER_NORMAL = createUserNormal();
     private final List<User> USER_LIST = getUsersList();
+    private final UserRegisterRequest REQUEST = createUserRegisterRequest();
+
+    private final Role ROLE_USER = getRoleUser();
+    private final Role ROLE_ADMIN = getRoleAdmin();
 
 
 
@@ -91,23 +98,37 @@ class UserServiceImplTest {
         createUserAdmin();
         createUserNormal();
         getUsersList();
+        createUserRegisterRequest();
+        getRoleUser();
+        getRoleAdmin();
     }
 
     @Test
     @SneakyThrows
     void saveUser_With_Successfully() {
-        UserRegisterRequest request = createUserRegisterRequest();
-
         when(userRepository.save(any())).thenReturn(USER_ADMIN);
         when(roleRepository.findByName(any())).thenReturn(ROLES_OPTIONAL_ADMIN);
 
-        UserInfoResponse response = service.saveUser(request);
+        UserInfoResponse response = service.saveUser(REQUEST);
 
         assertNotNull(response);
         assertEquals(ADMIN_ID, response.getId());
         assertEquals(ADMIN_USERNAME, response.getUsername());
         assertEquals(ADMIN_EMAIL,response.getEmail());
         assertEquals(ROLES_ADMIN, response.getRoles());
+    }
+
+    @Test
+    void saveUser_With_Unsuccessfully() {
+        when(userRepository.save(any())).thenThrow(new EmailAlreadyExistException("There's account with email"));
+        when(roleRepository.findByName(any())).thenReturn(ROLES_OPTIONAL_USER);
+
+        try {
+            UserInfoResponse infoResponse = service.saveUser(REQUEST);
+        } catch (Exception exception) {
+            assertEquals(EmailAlreadyExistException.class, exception.getClass());
+            assertEquals("There's account with email", exception.getMessage());
+        }
     }
 
     @Test
@@ -128,6 +149,34 @@ class UserServiceImplTest {
         assertEquals(ADMIN_EMAIL, responses.get(1).getEmail());
         assertEquals(ROLES_ADMIN, responses.get(1).getRoles());
     }
+
+    @Test
+    @SneakyThrows
+    void findTheRolesUserInTheDatabase_With_Successfully() {
+        when(roleRepository.findByName(any())).thenReturn(ROLES_OPTIONAL_USER);
+
+        Role response = service.findTheRolesInTheDatabase(ROLE_USER_NAME);
+
+        assertNotNull(response);
+        assertEquals(Role.class ,response.getClass());
+        assertEquals(ROLE_USER.getId(),response.getId());
+        assertEquals(ROLE_USER.getName(), response.getName());
+    }
+
+    @Test
+    void findTheRolesInTheDatabase_With_Unsuccessfully() {
+        when(roleRepository.findByName(any()))
+                .thenThrow(new MyRoleNotFoundException("Role not found"));
+
+        try {
+            service.findTheRolesInTheDatabase(ROLE_USER_NAME);
+        } catch (Exception exception) {
+            assertEquals(MyRoleNotFoundException.class, exception.getClass());
+            assertEquals("Role not found", exception.getMessage());
+        }
+    }
+
+
 
 
     /*
@@ -171,25 +220,25 @@ class UserServiceImplTest {
     *   |----> Just create new roles for testing
     * */
     private List<Role> getRoleAdminList() {
-        return List.of(new Role(2L, ROLE_ADMIN));
+        return List.of(new Role(2L, ROLE_ADMIN_NAME));
     }
 
     private Optional<Role> getRoleUserOptional() {
-        return Optional.of(new Role(2L, ROLE_USER));
+        return Optional.of(new Role(1L, ROLE_USER_NAME));
     }
     private Optional<Role> getRoleAdminOptional() {
-        return Optional.of(new Role(1L, ROLE_ADMIN));
+        return Optional.of(new Role(2L, ROLE_ADMIN_NAME));
     }
 
     private List<Role> getRoleUserList() {
-        return List.of(new Role(3L, ROLE_USER));
+        return List.of(new Role(1L, ROLE_USER_NAME));
     }
 
     private Role getRoleAdmin() {
-        return new Role(2L, ROLE_ADMIN);
+        return new Role(1L, ROLE_ADMIN_NAME);
     }
 
     private Role getRoleUser() {
-        return new Role(3L, ROLE_USER);
+        return new Role(1L, ROLE_USER_NAME);
     }
 }

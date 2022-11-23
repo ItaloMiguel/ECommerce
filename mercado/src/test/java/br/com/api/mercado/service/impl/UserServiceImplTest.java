@@ -51,6 +51,22 @@ class UserServiceImplTest {
     private static final String PASSWORD_REQUEST = "password";
 
 
+    /*  |--> CREATE ROLES
+    * */
+    private final List<Role> ROLES_USER = getRoleUserList();
+    private final List<Role> ROLES_ADMIN = getRoleAdminList();
+    private final Optional<Role> ROLES_OPTIONAL_USER = getRoleUserOptional();
+    private final Optional<Role> ROLES_OPTIONAL_ADMIN = getRoleAdminOptional();
+
+    /*  |--> CREATE USERS
+    * */
+    private final User USER_ADMIN = createUserAdmin();
+    private final User USER_NORMAL = createUserNormal();
+    private final List<User> USER_LIST = getUsersList();
+
+
+
+
     private UserServiceImpl service;
 
     @Mock
@@ -64,21 +80,26 @@ class UserServiceImplTest {
     void setUp() {
         MockitoAnnotations.openMocks(this);
         this.service = new UserServiceImpl(userRepository, roleRepository, passwordEncoder);
+        startAllMethods();
+    }
 
+    private void startAllMethods() {
+        getRoleUserList();
+        getRoleAdminList();
+        getRoleUserOptional();
+        getRoleAdminOptional();
+        createUserAdmin();
+        createUserNormal();
+        getUsersList();
     }
 
     @Test
     @SneakyThrows
     void saveUser_With_Successfully() {
-        User user = createUserAdmin();
-        List<Role> ROLES = getRoleAdminList();
-
-        Optional<Role> roles = getRoleAdminOptional();
-
         UserRegisterRequest request = createUserRegisterRequest();
 
-        when(userRepository.save(any())).thenReturn(user);
-        when(roleRepository.findByName(any())).thenReturn(roles);
+        when(userRepository.save(any())).thenReturn(USER_ADMIN);
+        when(roleRepository.findByName(any())).thenReturn(ROLES_OPTIONAL_ADMIN);
 
         UserInfoResponse response = service.saveUser(request);
 
@@ -86,25 +107,26 @@ class UserServiceImplTest {
         assertEquals(ADMIN_ID, response.getId());
         assertEquals(ADMIN_USERNAME, response.getUsername());
         assertEquals(ADMIN_EMAIL,response.getEmail());
-        assertEquals(ROLES, response.getRoles());
+        assertEquals(ROLES_ADMIN, response.getRoles());
     }
 
     @Test
     void listAllUsers_With_UserInfoResponse() {
-        List<Role> ROLES = getRoleUserList();
-        List<User> userList = new ArrayList<>();
-        userList.add(createUser());
-        userList.add(createUserAdmin());
-        UserInfoResponse infoResponse = createUserInfoResponseUser();
-
-        when(userRepository.findAll()).thenReturn(userList);
+        when(userRepository.findAll()).thenReturn(USER_LIST);
 
         List<UserInfoResponse> responses = service.findAll();
-        assertNotNull(responses);
+
+        assertNotNull(responses.get(0));
         assertEquals(USER_ID, responses.get(0).getId());
         assertEquals(USER_USERNAME, responses.get(0).getUsername());
         assertEquals(USER_EMAIL, responses.get(0).getEmail());
-        assertEquals(ROLES, responses.get(0).getRoles());
+        assertEquals(ROLES_USER, responses.get(0).getRoles());
+
+        assertNotNull(responses.get(1));
+        assertEquals(ADMIN_ID, responses.get(1).getId());
+        assertEquals(ADMIN_USERNAME, responses.get(1).getUsername());
+        assertEquals(ADMIN_EMAIL, responses.get(1).getEmail());
+        assertEquals(ROLES_ADMIN, responses.get(1).getRoles());
     }
 
 
@@ -114,11 +136,18 @@ class UserServiceImplTest {
     * */
     private User createUserAdmin() {
         List<Role> ROLES = getRoleAdminList();
-        return new User(ADMIN_ID, ADMIN_USERNAME, ADMIN_EMAIL, passwordEncoder.encode(ADMIN_PASSWORD), ROLES);
+        return new User(ADMIN_ID, ADMIN_USERNAME, ADMIN_EMAIL, ADMIN_PASSWORD, ROLES);
     }
-    private User createUser() {
+    private User createUserNormal() {
         List<Role> ROLES = getRoleUserList();
-        return new User(USER_ID, USER_USERNAME, USER_EMAIL, passwordEncoder.encode(USER_PASSWORD), ROLES);
+        return new User(USER_ID, USER_USERNAME, USER_EMAIL, USER_PASSWORD, ROLES);
+    }
+
+    private List<User> getUsersList() {
+        List<User> userList = new ArrayList<>();
+        userList.add(USER_NORMAL);
+        userList.add(USER_ADMIN);
+        return userList;
     }
 
     /*  |--> USER REGISTER RESPONSE
@@ -126,7 +155,7 @@ class UserServiceImplTest {
     *   |----> Example: saveUser.
     * */
     private UserRegisterRequest createUserRegisterRequest() {
-        return new UserRegisterRequest(USERNAME_REQUEST, EMAIL_REQUEST, passwordEncoder.encode(PASSWORD_REQUEST));
+        return new UserRegisterRequest(USERNAME_REQUEST, EMAIL_REQUEST, PASSWORD_REQUEST);
     }
 
     /*  |--> USER INFO RESPONSE =-=-=
@@ -145,19 +174,22 @@ class UserServiceImplTest {
     /*  |--> CREATING ROLES
     *   |----> Just create new roles for testing
     * */
-    private static List<Role> getRoleAdminList() {
+    private List<Role> getRoleAdminList() {
         return List.of(new Role(2L, ROLE_ADMIN));
     }
 
-    private static Optional<Role> getRoleAdminOptional() {
-        return Optional.of(new Role(2L, ROLE_ADMIN));
+    private Optional<Role> getRoleUserOptional() {
+        return Optional.of(new Role(2L, ROLE_USER));
+    }
+    private Optional<Role> getRoleAdminOptional() {
+        return Optional.of(new Role(1L, ROLE_ADMIN));
     }
 
-    private static List<Role> getRoleUserList() {
+    private List<Role> getRoleUserList() {
         return List.of(new Role(3L, ROLE_USER));
     }
 
-    private static Role getRoleAdmin() {
+    private Role getRoleAdmin() {
         return new Role(2L, ROLE_ADMIN);
     }
 

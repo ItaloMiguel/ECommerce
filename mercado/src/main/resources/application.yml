@@ -1,16 +1,7 @@
-
 server:
   port: 8080
-  servlet:
-    context-path: /resource-server
 
 spring:
-  security:
-    oauth2:
-      resourceserver:
-        jwt:
-          issuer-uri: http://localhost:8083/auth/realms/mercado
-          jwk-set-uri: http://localhost:8083/auth/realms/mercado/protocol/openid-connect/certs
   application:
     name: ecommerce
   datasource:

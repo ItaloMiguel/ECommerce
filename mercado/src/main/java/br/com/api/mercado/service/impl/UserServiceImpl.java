@@ -1,6 +1,5 @@
 package br.com.api.mercado.service.impl;
 
-import br.com.api.mercado.enums.RoleType;
 import br.com.api.mercado.exceptions.MyRoleNotFoundException;
 import br.com.api.mercado.model.Role;
 import br.com.api.mercado.model.User;
@@ -9,9 +8,7 @@ import br.com.api.mercado.payload.response.UserInfoResponse;
 import br.com.api.mercado.repository.RoleRepository;
 import br.com.api.mercado.repository.UserRepository;
 import br.com.api.mercado.service.UserService;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.bytebuddy.implementation.bytecode.ShiftRight;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,14 +22,20 @@ import static br.com.api.mercado.enums.RoleType.ROLE_USER;
 @Slf4j
 @Service
 @Transactional
-@RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final BCryptPasswordEncoder passwordEncoder;
+
+    public UserServiceImpl(UserRepository userRepository, RoleRepository roleRepository, BCryptPasswordEncoder passwordEncoder) {
+        this.userRepository = userRepository;
+        this.roleRepository = roleRepository;
+        this.passwordEncoder = passwordEncoder;
+    }
+
     @Override
-    public UserInfoResponse saveUser(UserRegisterRequest request) throws RoleNotFoundException {
+    public UserInfoResponse saveUser(UserRegisterRequest request) {
         log.info("new user request sent, Request information: " + request);
         Role role_user = findTheRolesInTheDatabase(ROLE_USER.name());
 
@@ -55,9 +58,9 @@ public class UserServiceImpl implements UserService {
         return userList.stream().map(UserInfoResponse::myBuilder).toList();
     }
 
-    protected Role findTheRolesInTheDatabase(String role) throws RoleNotFoundException {
+    protected Role findTheRolesInTheDatabase(String role) {
         log.info("Find role: " + role);
         return roleRepository.findByName(role)
-                .orElseThrow(() -> new MyRoleNotFoundException( role + " not found. There's a problem in the 'system' or 'code', please check if 'ROLE_USER' is present"));
+                .orElseThrow(() -> new MyRoleNotFoundException( role + " not found. There's a problem in the 'system' or 'code', please check if '" + role + "' is present"));
     }
 }

@@ -36,25 +36,25 @@ public class WebSecurityConfiguration {
         http
                 .cors().and().csrf().disable()
                 .authorizeRequests((authz) -> authz
-                        .antMatchers(HttpMethod.GET,"/user/info", "/api/home**").hasAnyAuthority("SCORE_read")
-                        .antMatchers(HttpMethod.POST,"/api/home**").hasAnyAuthority("SCORE_read")
+                        .antMatchers(HttpMethod.GET,"/user/info", "/api/home/**").permitAll()
+                        .antMatchers(HttpMethod.POST,"/api/home/**").permitAll()
                         .anyRequest().authenticated()
-                ).oauth2ResourceServer().jwt();
+                ).httpBasic(withDefaults());
         return http.build();
     }
 
-    @Bean
-    public DaoAuthenticationProvider authProvider() {
-        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-        authProvider.setUserDetailsService(userDetailsService);
-        authProvider.setPasswordEncoder(passwordEncoder);
-        return authProvider;
-    }
-
-    @Bean
-    public void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.authenticationProvider(authProvider);
-    }
+//    @Bean
+//    public DaoAuthenticationProvider authProvider() {
+//        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+//        authProvider.setUserDetailsService(userDetailsService);
+//        authProvider.setPasswordEncoder(passwordEncoder);
+//        return authProvider;
+//    }
+//
+//    @Bean
+//    public void configure(AuthenticationManagerBuilder auth) throws Exception {
+//        auth.authenticationProvider(authProvider);
+//    }
 
     @Bean
     public InMemoryUserDetailsManager userDetailsService() {
@@ -65,7 +65,4 @@ public class WebSecurityConfiguration {
                 .build();
         return new InMemoryUserDetailsManager(user);
     }
-
-
-
 }

@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface UserService {
 
-    UserInfoResponse saveUser(UserRegisterRequest request) throws RoleNotFoundException;
+    UserInfoResponse saveUser(UserRegisterRequest request);
 
     List<UserInfoResponse> findAll();
 }

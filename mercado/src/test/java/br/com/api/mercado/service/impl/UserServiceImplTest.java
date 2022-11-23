@@ -7,7 +7,6 @@ import br.com.api.mercado.payload.response.UserInfoResponse;
 import br.com.api.mercado.repository.RoleRepository;
 import br.com.api.mercado.repository.UserRepository;
 import lombok.SneakyThrows;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -15,7 +14,6 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,21 +24,28 @@ import static org.mockito.Mockito.when;
 
 class UserServiceImplTest {
 
-    // USER ADMIN
-    private static final Long ID = 1L;
-    private static final String USERNAME = "admin";
-    private static final String EMAIL = "admin@test.com";
-    private static final String PASSWORD = "password";
+    /*  |--> INFO OF USER ADMIN
+    *   |----> it's was use for create user_admin
+    * */
+    private static final Long ADMIN_ID = 1L;
+    private static final String ADMIN_USERNAME = "admin";
+    private static final String ADMIN_EMAIL = "admin@test.com";
+    private static final String ADMIN_PASSWORD = "password";
     private static final String ROLE_ADMIN = "ROLE_ADMIN";
 
-    // USER NORMAL
+     /*  |--> INFO OF USER NORMAL
+     *   |----> it's was use for create user_normal
+     * */
     private static final Long USER_ID = 2L;
     private static final String USER_USERNAME = "user";
     private static final String USER_EMAIL = "user@test.com";
     private static final String USER_PASSWORD = "password";
     private static final String ROLE_USER = "ROLE_USER";
 
-    // USER REGISTER REQUEST
+
+     /*  |--> INFO OF USER REGISTER REQUEST
+     *   |----> it's was use for create user_register_request
+     * */
     private static final String USERNAME_REQUEST = "request";
     private static final String EMAIL_REQUEST = "request@test.com";
     private static final String PASSWORD_REQUEST = "password";
@@ -66,17 +71,21 @@ class UserServiceImplTest {
     @SneakyThrows
     void saveUser_With_Successfully() {
         User user = createUserAdmin();
-        Optional<Role> roles = getRoleAdminOptional();
         List<Role> ROLES = getRoleAdminList();
+
+        Optional<Role> roles = getRoleAdminOptional();
+
         UserRegisterRequest request = createUserRegisterRequest();
+
         when(userRepository.save(any())).thenReturn(user);
         when(roleRepository.findByName(any())).thenReturn(roles);
 
         UserInfoResponse response = service.saveUser(request);
+
         assertNotNull(response);
-        assertEquals(ID, response.getId());
-        assertEquals(USERNAME, response.getUsername());
-        assertEquals(EMAIL ,response.getEmail());
+        assertEquals(ADMIN_ID, response.getId());
+        assertEquals(ADMIN_USERNAME, response.getUsername());
+        assertEquals(ADMIN_EMAIL,response.getEmail());
         assertEquals(ROLES, response.getRoles());
     }
 
@@ -100,27 +109,41 @@ class UserServiceImplTest {
 
 
     /*
-    * PART OF CREATING USERS
+    *   |--> CREATING USERS FOR TEST
+    *   |----> Just create new users for testing
     * */
     private User createUserAdmin() {
         List<Role> ROLES = getRoleAdminList();
-        return new User(ID, USERNAME, EMAIL, passwordEncoder.encode(PASSWORD), ROLES);
+        return new User(ADMIN_ID, ADMIN_USERNAME, ADMIN_EMAIL, passwordEncoder.encode(ADMIN_PASSWORD), ROLES);
     }
     private User createUser() {
         List<Role> ROLES = getRoleUserList();
         return new User(USER_ID, USER_USERNAME, USER_EMAIL, passwordEncoder.encode(USER_PASSWORD), ROLES);
     }
+
+    /*  |--> USER REGISTER RESPONSE
+    *   |----> This class is call when exist a new register of user
+    *   |----> Example: saveUser.
+    * */
     private UserRegisterRequest createUserRegisterRequest() {
         return new UserRegisterRequest(USERNAME_REQUEST, EMAIL_REQUEST, passwordEncoder.encode(PASSWORD_REQUEST));
     }
 
+    /*  |--> USER INFO RESPONSE =-=-=
+    *   |----> This class is call when return information of users
+    *   |----> Example: listAll, findById, etc...
+    * */
     private UserInfoResponse createUserInfoResponseUser() {
         List<Role> ROLES = getRoleUserList();
         return new UserInfoResponse(USER_ID, USER_USERNAME, USER_EMAIL, ROLES);
     }
+    private UserInfoResponse createUserInfoResponseAdmin() {
+        List<Role> ROLES = getRoleAdminList();
+        return new UserInfoResponse(ADMIN_ID, ADMIN_USERNAME, ADMIN_EMAIL, ROLES);
+    }
 
-    /*
-    * PART OF CREATING A ROLES
+    /*  |--> CREATING ROLES
+    *   |----> Just create new roles for testing
     * */
     private static List<Role> getRoleAdminList() {
         return List.of(new Role(2L, ROLE_ADMIN));

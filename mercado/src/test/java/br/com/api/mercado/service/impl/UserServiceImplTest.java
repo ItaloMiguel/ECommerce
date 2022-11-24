@@ -62,8 +62,8 @@ class UserServiceImplTest {
 
     /*  |--> CREATE ROLES
     * */
-    private final List<Role> ROLES_USER = getRoleUserList();
-    private final List<Role> ROLES_ADMIN = getRoleAdminList();
+    private final Set<Role> ROLES_USER = getRoleUserList();
+    private final Set<Role> ROLES_ADMIN = getRoleAdminList();
     private final Optional<Role> ROLES_OPTIONAL_USER = getRoleUserOptional();
     private final Optional<Role> ROLES_OPTIONAL_ADMIN = getRoleAdminOptional();
     private final Role ROLE_USER = getRoleUser();
@@ -234,9 +234,7 @@ class UserServiceImplTest {
     /*  |--> CREATING ROLES
     *   |----> Just create new roles for testing
     * */
-    private List<Role> getRoleAdminList() {
-        return List.of(new Role(2L, ROLE_ADMIN_NAME));
-    }
+
 
     private Optional<Role> getRoleUserOptional() {
         return Optional.of(new Role(1L, ROLE_USER_NAME));
@@ -245,8 +243,12 @@ class UserServiceImplTest {
         return Optional.of(new Role(2L, ROLE_ADMIN_NAME));
     }
 
-    private List<Role> getRoleUserList() {
-        return List.of(new Role(1L, ROLE_USER_NAME));
+    private Set<Role> getRoleAdminList() {
+        return Set.of(new Role(2L, ROLE_ADMIN_NAME));
+    }
+
+    private Set<Role> getRoleUserList() {
+        return Set.of(new Role(1L, ROLE_USER_NAME));
     }
 
     private Role getRoleAdmin() {

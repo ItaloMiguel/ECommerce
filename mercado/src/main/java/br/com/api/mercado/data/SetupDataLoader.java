@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import static br.com.api.mercado.enums.RoleType.ROLE_ADMIN;
 import static br.com.api.mercado.enums.RoleType.ROLE_USER;
@@ -56,7 +57,7 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
         if(optionalEmail.isEmpty() || optionalUsername.isEmpty()) {
             log.info("Saving user test to the database");
             userRepository.save(new User(1L, "test_firstName", "test_lastName", "test",
-                    "test@test.com", passwordEncoder.encode("password"), 22, List.of(role)));
+                    "test@test.com", passwordEncoder.encode("password"), 22, Set.of(role)));
         }
     }
 

@@ -17,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -72,8 +73,8 @@ class AuthControllerTest {
 
      /*  |--> CREATE ROLES
      * */
-    private final List<Role> ROLES_USER = getRoleUserList();
-    private final List<Role> ROLES_ADMIN = getRoleAdminList();
+    private final Set<Role> ROLES_USER = getRoleUserList();
+    private final Set<Role> ROLES_ADMIN = getRoleAdminList();
     private final Role ROLE_USER = getRoleUser();
     private final Role ROLE_ADMIN = getRoleAdmin();
     private final Optional<Role> ROLES_OPTIONAL_USER = getRoleUserOptional();
@@ -202,20 +203,19 @@ class AuthControllerTest {
      /*  |--> CREATING ROLES
      *   |----> Just create new roles for testing
      * */
-    private List<Role> getRoleAdminList() {
-        return List.of(new Role(2L, ROLE_ADMIN_NAME));
-    }
 
     private Optional<Role> getRoleUserOptional() {
         return Optional.of(new Role(1L, ROLE_USER_NAME));
     }
-
     private Optional<Role> getRoleAdminOptional() {
         return Optional.of(new Role(2L, ROLE_ADMIN_NAME));
     }
 
-    private List<Role> getRoleUserList() {
-        return List.of(new Role(1L, ROLE_USER_NAME));
+    private Set<Role> getRoleUserList() {
+        return Set.of(new Role(1L, ROLE_USER_NAME));
+    }
+    private Set<Role> getRoleAdminList() {
+        return Set.of(new Role(2L, ROLE_ADMIN_NAME));
     }
 
     private Role getRoleAdmin() {

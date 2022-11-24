@@ -7,10 +7,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import javax.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Entity
 @Table(name = "users")
@@ -33,7 +30,7 @@ public class User {
     private String password;
     private Integer yourAge;
     @ManyToMany(fetch = FetchType.EAGER)
-    private Collection<Role> roles = new ArrayList<>();
+    private Set<Role> roles = new HashSet<>();
 
     public static User myBuilder(UserRegisterRequest request, Set<Role> role_user, BCryptPasswordEncoder passwordEncoder) {
         return User.builder()

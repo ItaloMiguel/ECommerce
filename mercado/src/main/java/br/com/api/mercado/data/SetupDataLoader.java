@@ -1,5 +1,6 @@
 package br.com.api.mercado.data;
 
+import br.com.api.mercado.enums.RoleType;
 import br.com.api.mercado.exceptions.MyRoleNotFoundException;
 import br.com.api.mercado.model.Role;
 import br.com.api.mercado.model.User;
@@ -15,6 +16,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+
+import static br.com.api.mercado.enums.RoleType.ROLE_ADMIN;
+import static br.com.api.mercado.enums.RoleType.ROLE_USER;
 
 @Slf4j
 @Component
@@ -35,8 +39,8 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
     @Override
     @Transactional
     public void onApplicationEvent(ContextRefreshedEvent event) {
-            createRoleIfNotExist("ROLE_ADMIN");
-            createRoleIfNotExist("ROLE_USER");
+            createRoleIfNotExist(ROLE_ADMIN.name());
+            createRoleIfNotExist(ROLE_USER.name());
 
             createNewUserTestIfNotExist();
 

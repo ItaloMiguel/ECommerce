@@ -6,11 +6,13 @@ import br.com.api.mercado.payload.response.UserInfoResponse;
 import br.com.api.mercado.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
+import org.aspectj.bridge.Message;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+
+import java.util.List;
 
 import static org.springframework.http.HttpStatus.CREATED;
 
@@ -22,6 +24,15 @@ import static org.springframework.http.HttpStatus.CREATED;
 public class AuthController {
 
     private final UserService userService;
+
+
+    @GetMapping
+    public ResponseEntity<List<UserInfoResponse>> findByUserForId() {
+        log.info("Starting find all users");
+        List<UserInfoResponse> userInfoResponseList = userService.findAll();
+        return ResponseEntity.ok().body(userInfoResponseList);
+    }
+
 
     @PostMapping
     public ResponseEntity<?> registerUser(@RequestBody @Valid UserRegisterRequest request) {

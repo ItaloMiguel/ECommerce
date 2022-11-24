@@ -74,19 +74,20 @@ class AuthControllerTest {
      * */
     private final List<Role> ROLES_USER = getRoleUserList();
     private final List<Role> ROLES_ADMIN = getRoleAdminList();
-    private final Optional<Role> ROLES_OPTIONAL_USER = getRoleUserOptional();
-    private final Optional<Role> ROLES_OPTIONAL_ADMIN = getRoleAdminOptional();
     private final Role ROLE_USER = getRoleUser();
     private final Role ROLE_ADMIN = getRoleAdmin();
+    private final Optional<Role> ROLES_OPTIONAL_USER = getRoleUserOptional();
+    private final Optional<Role> ROLES_OPTIONAL_ADMIN = getRoleAdminOptional();
 
-     /*  |--> CREATE USERS
+
+     /*  |--> CREATE ALL TYPE OF USERS
      * */
     private final User USER_ADMIN = createUserAdmin();
     private final User USER_NORMAL = createUserNormal();
-    private final List<User> USER_LIST = getUsersList();
     private final UserRegisterRequest REQUEST = createUserRegisterRequest();
     private final UserInfoResponse RESPONSE_USER = createUserInfoResponseUser();
     private final UserInfoResponse RESPONSE_ADMIN = createUserInfoResponseAdmin();
+    private final List<UserInfoResponse> USER_INFO_RESPONSE_LIST = getUsersList();
 
     private AuthController controller;
 
@@ -117,13 +118,54 @@ class AuthControllerTest {
     void registerUserThenReturnSuccessfully() {
         when(userService.saveUser(any())).thenReturn(RESPONSE_USER);
 
-        ResponseEntity<?> responseEntity = controller.registerUser(REQUEST);
+        ResponseEntity<?> response = controller.registerUser(REQUEST);
 
-        assertEquals(HttpStatus.CREATED, responseEntity.getStatusCode());
-        assertEquals(201 ,responseEntity.getStatusCodeValue());
+        assertNotNull(response);
+        assertNotNull(response.getBody());
+        assertNotNull(response.getStatusCode());
+        assertEquals(ResponseEntity.class , response.getClass());
+        assertEquals(HttpStatus.CREATED, response.getStatusCode());
+        assertEquals(201 , response.getStatusCodeValue());
+        assertEquals(MessageResponse.class , response.getBody().getClass());
     }
 
-    /*   |--> CREATING USERS FOR TEST
+    @Test
+    void findAllUserThenReturnSuccessfully() {
+        when(userService.findAll()).thenReturn(USER_INFO_RESPONSE_LIST);
+
+        ResponseEntity<List<UserInfoResponse>> response = controller.findByUserForId();
+
+        assertNotNull(response);
+        assertNotNull(response.getBody().get(0).getClass());
+        assertNotNull(response.getBody().get(1).getClass());
+        assertNotNull(response.getBody());
+
+        assertEquals(ResponseEntity.class , response.getClass());
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(200 , response.getStatusCodeValue());
+        assertEquals(UserInfoResponse.class , response.getBody().get(0).getClass());
+        assertEquals(UserInfoResponse.class , response.getBody().get(1).getClass());
+
+
+        assertEquals(RESPONSE_USER.getId(), response.getBody().get(0).getId());
+        assertEquals(RESPONSE_USER.getFistName(), response.getBody().get(0).getFistName());
+        assertEquals(RESPONSE_USER.getLastName(), response.getBody().get(0).getLastName());
+        assertEquals(RESPONSE_USER.getUsername(), response.getBody().get(0).getUsername());
+        assertEquals(RESPONSE_USER.getEmail(), response.getBody().get(0).getEmail());
+        assertEquals(RESPONSE_USER.getYourAge(), response.getBody().get(0).getYourAge());
+        assertEquals(RESPONSE_USER.getRoles(), response.getBody().get(0).getRoles());
+
+
+        assertEquals(RESPONSE_ADMIN.getId(), response.getBody().get(1).getId());
+        assertEquals(RESPONSE_ADMIN.getFistName(), response.getBody().get(1).getFistName());
+        assertEquals(RESPONSE_ADMIN.getLastName(), response.getBody().get(1).getLastName());
+        assertEquals(RESPONSE_ADMIN.getUsername(), response.getBody().get(1).getUsername());
+        assertEquals(RESPONSE_ADMIN.getEmail(), response.getBody().get(1).getEmail());
+        assertEquals(RESPONSE_ADMIN.getYourAge(), response.getBody().get(1).getYourAge());
+        assertEquals(RESPONSE_ADMIN.getRoles(), response.getBody().get(1).getRoles());
+    }
+
+     /*  |--> CREATING USERS FOR TEST
      *   |----> Just create new users for testing
      * */
     private User createUserAdmin() {
@@ -133,8 +175,8 @@ class AuthControllerTest {
         return new User(USER_ID, USER_FIST_NAME, USER_LAST_NAME, USER_USERNAME, USER_EMAIL, USER_PASSWORD, USER_AGE_YEAR, ROLES_USER);
     }
 
-    private List<User> getUsersList() {
-        return List.of(USER_NORMAL, USER_ADMIN);
+    private List<UserInfoResponse> getUsersList() {
+        return List.of(RESPONSE_USER, RESPONSE_ADMIN);
     }
 
      /*  |--> USER REGISTER RESPONSE
